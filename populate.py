@@ -31,6 +31,7 @@ def entry_grabber(feeds, db_file):
 
     current_time = get_current_date()
 
+    # Could probably make this faster
     for url in feeds:
         d = fp.parse(url.strip("\n"))
         for entry in d.entries:
@@ -38,11 +39,12 @@ def entry_grabber(feeds, db_file):
             INSERT INTO rmotdEntries (title, desc, link, read, day, year)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (entry.title, entry.description, entry.link, False, current_time[0], current_time[1]))
+            (entry.title, sanitize(entry.description), entry.link,
+             False, current_time[0], current_time[1]))
 
     # Add this in ONLY to verify the queries added successfully
-    cur.execute("SELECT * FROM rmotdEntries")
-    rows = cur.fetchall()
+    cur.execute("SELECT title, desc, link FROM rmotdEntries")
+    rows = cur.fetchone()
 
     # For testing purposes. Prints out all contents in table
     for _ in rows:
@@ -51,6 +53,8 @@ def entry_grabber(feeds, db_file):
     conn.commit()
     conn.close()
 
-    
 
-
+def sanitize(entry_desc):
+    """ Cleans up entry descriptions.
+        Looks for extra <p> and </p> """
+    return entry_desc[:entry_desc.find("<p>")]

@@ -26,9 +26,9 @@ def store_subs():
     feeds_file = ".rmotd_feeds"
     subs = []
     while True:
-        enter_sub = input("Please enter an RSS feed. When done, press [ENTER/RETURN] to submit or quit: ") + "\n"
+        enter_sub = input("Please enter an RSS feed. When done, press [ENTER|RETURN] to submit or quit: ") + "\n"
         if enter_sub.strip("\n") == "":
-            confirm_done = input("Press [ENTER/RETURN] again to quit...")
+            confirm_done = input("Press [ENTER|RETURN] again to quit...")
             if confirm_done.lower() == "":
                 break
             continue

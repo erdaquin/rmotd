@@ -1,5 +1,8 @@
 # Used to clean up old entries in rmotd_feed.db
 
+# Import necessary libs...
+import sqlite3
+
 # Import necessary files...
 from helper import get_current_date
 
@@ -12,9 +15,21 @@ def get_age_of_entry(day, year):
     else:
         return abs(day - curr[0])
 
-def rem_entry_from_db(entry, entry_age):
+def rem_entries_from_db(db_file, entry_age=2):
     """ Checks age of read entries and removes `old` entries from db """
-    if age >= 3:
-        # Do stuff with entry
-        pass
-    
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+
+    cur.execute("SELECT title, day, year FROM rmotdEntries WHERE read = 1")
+    read_entries = [row for row in cur.fetchall()]
+
+    for entry in read_entries:
+        if get_age_of_entry(entry[1], entry[2]) >= entry_age:
+            cur.execute("""
+            DELETE FROM rmotdEntries
+            WHERE title = (?)
+            """,
+            (entry[0],))
+
+    conn.commit()
+    cur.close()

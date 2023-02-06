@@ -12,7 +12,7 @@ def init_db(db_file):
         title TEXT,
         desc TEXT,
         link TEXT,
-        read BOOLEAN,
+        read NUMERIC,
         day NUMERIC,
         year NUMERIC
     )
@@ -21,6 +21,7 @@ def init_db(db_file):
     conn.commit()
     conn.close()
 
+# Maybe inform user to only type short-url, not w/ https://
 def store_subs():
     """ Prompt user to store RSS subscriptions """
     feeds_file = ".rmotd_feeds"
@@ -37,7 +38,7 @@ def store_subs():
             print("Please enter a valid RSS feed.")
             continue
         else:
-            subs.append(enter_sub)
+            subs.append("https://" + enter_sub)
 
     # Check if user input anything 
     if len(subs) == 0:

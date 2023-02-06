@@ -1,7 +1,7 @@
 # Fetches entries from RSS subscriptions and populates database
 
 # Import necessary libs...
-import sys
+from sys import exit
 import sqlite3
 import feedparser as fp
 
@@ -17,12 +17,13 @@ def push_to_db(db_file):
     except FileNotFoundError:
         print("[ERROR] - No feeds file found!\n"\
               "Try running `rmotd --setup` to create a feeds file..."
-        )
-        sys.exit()
+              )
+        exit()
 
     entry_grabber(feeds, db_file)
 
 
+# Test to see if there are duplicate entries
 def entry_grabber(feeds, db_file):
     """ Pulls entries down from RSS feeds
         and inserts them into rmotd db """
@@ -31,24 +32,27 @@ def entry_grabber(feeds, db_file):
 
     current_time = get_current_date()
 
+    # Get a list of existing entries
+    cur.execute("""
+    SELECT title from rmotdEntries
+    WHERE day = (?) and year = (?)
+    """,
+                (current_time[0], current_time[1])
+                )
+    existing_entries = [row[0] for row in cur.fetchall()]
+
     # Could probably make this faster
     for url in feeds:
         d = fp.parse(url.strip("\n"))
         for entry in d.entries:
-            cur.execute("""
-            INSERT INTO rmotdEntries (title, desc, link, read, day, year)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (entry.title, sanitize(entry.description), entry.link,
-             False, current_time[0], current_time[1]))
-
-    # Add this in ONLY to verify the queries added successfully
-    cur.execute("SELECT title, desc, link FROM rmotdEntries")
-    rows = cur.fetchone()
-
-    # For testing purposes. Prints out all contents in table
-    for _ in rows:
-        print(_)
+            if entry.title not in existing_entries:
+                cur.execute("""
+                INSERT INTO rmotdEntries (title, desc, link, read, day, year)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                            (entry.title, sanitize(entry.description), entry.link,
+                             0, current_time[0], current_time[1])
+                            )
 
     conn.commit()
     conn.close()

@@ -1,11 +1,14 @@
 # Import necessary libs...
 import os
+from sys import exit
 import argparse
 
 # Import necessary files...
 import setup
 import populate
 import cleanup_entries
+import display
+from helper import testing_entries
 
 
 def main():
@@ -18,9 +21,8 @@ def main():
         print("Database now exists!")
 
     populate.push_to_db(db_file)
-    # Add exception here after some testing
-
-    # Add check for no entries in database
+    # testing_entries(db_file)
+    display.display_entry(db_file)
 
     # Add function to append entries to rss feeds file
 
@@ -32,7 +34,11 @@ def main():
     # Nevermind, that already happens lol. Just call store_subs() when
     # user runs --add to accomplish above
 
-    # Add in here somewhere cleanup_entries to clean the database!
+    # When calling this with `--age`, add argparse to pass in how age
+    # for removing entries. The current default is 2
+    # Add warning that `0` is NOT recommended
+    cleanup_entries.rem_entries_from_db(db_file)
+    exit()
 
     
 if __name__ == '__main__':

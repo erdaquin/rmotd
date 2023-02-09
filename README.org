@@ -1,7 +1,3 @@
-* Welcome to rmotd!
+* RMOTD - An RSS MOTD for Terminal CLS
 
-It is currently 3am and I am ready for bed, but I couldn't commit without a README!
-
-This is a WIP, so please take all code with a grain of salt as it has currently been written in one sitting on a Friday night.
-
-This will be updated, but to those who are looking back through the update logs, hello!
+Also working as a simple RSS reader, the intended purpose is to alias RMOTD alongside the "clear" command so that when you clear the screen, you get a random RSS message from your feeds.
